@@ -14,16 +14,17 @@ int main( int argc, char *argv[] )
     Game g( argv[1] );
     std::string guess = g.guess();
     unsigned int nbGuess = 0;
+    Game::Guess gs;
 
     while( guess != g.goal() )
     {
-      std::cout << "Guess: " << guess << std::endl;
+      gs = g.evaluateGuess( guess );
+      std::cout << "Guess: " << gs.guess << " " << gs.ok << "A" << gs.misplaced << "B" << std::endl;
       ++nbGuess;
       guess = g.guess();
     }
     std::cout << "Guess: " << guess << std::endl;
-    ++nbGuess;
-    std::cout << "Found goal in " << nbGuess << " guesses." << std::endl;
+    std::cout << "Found goal in " << ++nbGuess << " guesses." << std::endl;
   }
   catch( const std::invalid_argument& ia )
   {

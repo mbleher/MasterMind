@@ -15,14 +15,9 @@ class Game
 public: // Helper struct
 struct Guess
 {
-  //std::vector<char> guess;
   std::string guess;
   short ok;
   short misplaced;
-  /*
-  Guess() { guess = std::vector<char>( 4, ' ' ); ok = 0; misplaced = 0; }
-  ~Guess() {}
-  */
 };
 
 private:
@@ -43,6 +38,7 @@ public:
 
   // MEMBER FUNCTIONS
   const std::string guess();
+  Guess evaluateGuess( std::string& guess );
   void print() const;
 };
 
