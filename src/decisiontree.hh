@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 class Node
 {
@@ -23,8 +25,8 @@ public:
   bool active() const;
   int level() const;
   const Node& child( unsigned int index ) const;
-  //void count( unsigned int& acc ) const;
   unsigned int count() const;
+  void getRandomGuess( std::string& res );
   void print() const;
 };
 
@@ -46,6 +48,7 @@ public:
   // MEMBER FUNCTIONS
   void print() const;
   unsigned int count() const;
+  const std::string getRandomGuess();
 };
 
 #endif

@@ -12,8 +12,18 @@ int main( int argc, char *argv[] )
   try
   {
     Game g( argv[1] );
-    std::cout << g.goal() << std::endl;
-    g.print();
+    std::string guess = g.guess();
+    unsigned int nbGuess = 0;
+
+    while( guess != g.goal() )
+    {
+      std::cout << "Guess: " << guess << std::endl;
+      ++nbGuess;
+      guess = g.guess();
+    }
+    std::cout << "Guess: " << guess << std::endl;
+    ++nbGuess;
+    std::cout << "Found goal in " << nbGuess << " guesses." << std::endl;
   }
   catch( const std::invalid_argument& ia )
   {

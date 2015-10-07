@@ -55,9 +55,9 @@ std::vector<Game::Guess>& Game::guesses()
 
 // MEMBER FUNCTIONS
 
-const std::string Game::guess() const
+const std::string Game::guess()
 {
-  return "";
+  return d_dt.getRandomGuess();
 }
 
 void Game::print() const

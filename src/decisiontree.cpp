@@ -80,6 +80,18 @@ unsigned int Node::count() const
   return acc;
 }
 
+void Node::getRandomGuess( std::string& res )
+{
+  if( d_level == 4 )
+  {
+    d_active = false;
+    return;
+  }
+  int nextIndex = std::rand() % ( 10 - d_level );
+  res += d_children[nextIndex].d_value;
+  d_children[nextIndex].getRandomGuess( res );
+}
+
 void Node::print() const
 {
   std::cout << "Val: " << d_value << std::endl;
@@ -118,6 +130,7 @@ DecisionTree::DecisionTree()
   : d_nLeft( 10 * 9 * 8 * 7 )
 {
   d_root = Node( "", ' ', 0 );
+  std::srand( std::time( 0 ) );
 }
 
 
@@ -162,6 +175,14 @@ void DecisionTree::print() const
 unsigned int DecisionTree::count() const
 {
   return d_root.count();
+}
+
+const std::string DecisionTree::getRandomGuess()
+{
+  std::string res;
+
+  d_root.getRandomGuess( res );
+  return res;
 }
 
 

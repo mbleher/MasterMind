@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-//#include <queue>
+#include <queue>
 
 class Game
 {
@@ -42,7 +42,7 @@ public:
   std::vector<Game::Guess>& guesses();
 
   // MEMBER FUNCTIONS
-  const std::string guess() const;
+  const std::string guess();
   void print() const;
 };
 
