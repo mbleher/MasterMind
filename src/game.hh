@@ -4,6 +4,7 @@
 # define INCLUDED_GAME
 
 #include "decisiontree.hh"
+#include "guess.hh"
 #include <string>
 #include <iostream>
 #include <stdexcept>
@@ -12,14 +13,6 @@
 
 class Game
 {
-public: // Helper struct
-struct Guess
-{
-  std::string guess;
-  short ok;
-  short misplaced;
-};
-
 private:
   std::string d_goal;
   std::vector<Guess> d_guesses;
@@ -34,7 +27,8 @@ public:
 
   // ACCESSORS
   const std::string& goal() const;
-  std::vector<Game::Guess>& guesses();
+  std::vector<Guess>& guesses();
+  unsigned int nLeft() const;
 
   // MEMBER FUNCTIONS
   const std::string guess();

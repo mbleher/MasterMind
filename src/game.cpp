@@ -47,11 +47,15 @@ const std::string& Game::goal() const
   return d_goal;
 }
 
-std::vector<Game::Guess>& Game::guesses()
+std::vector<Guess>& Game::guesses()
 {
   return d_guesses;
 }
 
+unsigned int Game::nLeft() const
+{
+  return d_dt.nLeft();
+}
 
 // MEMBER FUNCTIONS
 
@@ -60,29 +64,30 @@ const std::string Game::guess()
   return d_dt.getRandomGuess();
 }
 
-Game::Guess Game::evaluateGuess( std::string& guess )
+Guess Game::evaluateGuess( std::string& guess )
 {
   short nbok = 0;
   short nbmisplaced = 0;
 
   for( unsigned int i = 0; i < 4; ++i )
   {
-    if( guess[i] == d_goal[i] )
-    {
-      ++nbok;
-    }
-  }
-  for( unsigned int i = 0; i < 4; ++i )
-  {
     for( unsigned int j = 0; j < 4; ++j )
     {
-      if( i != j && guess[i] == d_goal[j] )
+      if( guess[i] == d_goal[j] )
       {
-	++nbmisplaced;
+	if ( i == j )
+	{
+	  ++nbok;
+	}
+	else
+	{
+	  ++nbmisplaced;
+	}
       }
     }
   }
-  Game::Guess g = { guess, nbok, nbmisplaced };
+  Guess g = { guess, nbok, nbmisplaced };
+  d_dt.processGuess( g );
   d_guesses.push_back( g );
   return g;
 }

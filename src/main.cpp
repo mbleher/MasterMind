@@ -14,12 +14,20 @@ int main( int argc, char *argv[] )
     Game g( argv[1] );
     std::string guess = g.guess();
     unsigned int nbGuess = 0;
-    Game::Guess gs;
+    Guess gs;
 
+    /*
+    std::cout << g.nLeft() << std::endl;
+    std::cout << guess << std::endl;
+    gs = g.evaluateGuess( guess );
+    std::cout << g.nLeft() << std::endl;
+    */
+    
     while( guess != g.goal() )
     {
       gs = g.evaluateGuess( guess );
       std::cout << "Guess: " << gs.guess << " " << gs.ok << "A" << gs.misplaced << "B" << std::endl;
+      std::cout << "Number of possibilities left: " << g.nLeft() << std::endl;
       ++nbGuess;
       guess = g.guess();
     }

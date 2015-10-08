@@ -88,8 +88,37 @@ void Node::getRandomGuess( std::string& res )
     return;
   }
   int nextIndex = std::rand() % ( 10 - d_level );
+  while( !d_children[nextIndex].d_active )
+  {
+    nextIndex = std::rand() % ( 10 - d_level );
+  }
   res += d_children[nextIndex].d_value;
   d_children[nextIndex].getRandomGuess( res );
+}
+
+void Node::deactivate( char c, int level )
+{
+  bool found;
+
+  if( d_level == level )
+  {
+    found = false;
+    for( unsigned int i = 0; !found && i < d_children.size(); ++i )
+    {
+      if( d_children[i].d_value == c )
+      {
+	d_children[i].d_active = false;
+	found = true;
+      }
+    }
+  }
+  else
+  {
+    for( unsigned int i = 0; i < d_children.size(); ++i )
+    {
+      d_children[i].deactivate( c, level );
+    }	
+  }
 }
 
 void Node::print() const
@@ -185,6 +214,17 @@ const std::string DecisionTree::getRandomGuess()
   return res;
 }
 
+void DecisionTree::processGuess( Guess g )
+{
+  if( g.ok == 0 )
+  {
+    for( int i = 0; i < 4; ++i )
+    {
+      d_root.deactivate( g.guess[i], i );
+    }
+  }
+  d_nLeft = d_root.count();
+}
 
 // FREE OPERATORS
 

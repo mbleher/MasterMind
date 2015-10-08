@@ -3,6 +3,7 @@
 #ifndef INCLUDED_DECISIONTREE
 # define INCLUDED_DECISIONTREE
 
+#include "guess.hh"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -27,6 +28,7 @@ public:
   const Node& child( unsigned int index ) const;
   unsigned int count() const;
   void getRandomGuess( std::string& res );
+  void deactivate( char c, int level );
   void print() const;
 };
 
@@ -49,6 +51,7 @@ public:
   void print() const;
   unsigned int count() const;
   const std::string getRandomGuess();
+  void processGuess( Guess g );
 };
 
 #endif
