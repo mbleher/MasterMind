@@ -18,17 +18,24 @@ private:
   bool d_active;
   int d_level;
 public:
+  // CONSTRUCTORS
   Node();
   Node( const std::string& impossible, char value, int level );
+
+  // DESTRUCTORS
   ~Node();
-  //std::vector<Node>& children();
+
+  // ACCESSORS
   char value() const;
   bool active() const;
   int level() const;
   const Node& child( unsigned int index ) const;
+
+  // MEMBER FUNCTIONS
   unsigned int count() const;
   void getRandomGuess( std::string& res );
-  void deactivate( char c, int level );
+  void checkActiveSons();
+  void deactivateSons( char c, int level );
   void print() const;
 };
 
@@ -37,6 +44,9 @@ class DecisionTree
 private:
   unsigned int d_nLeft;
   Node d_root;
+  std::vector<std::pair<int, int> > scores;
+
+  void updateScores( char c, int toAdd );
 public:
   // CONSTRUCTORS
   DecisionTree();

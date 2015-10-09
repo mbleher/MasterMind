@@ -88,15 +88,34 @@ void Node::getRandomGuess( std::string& res )
     return;
   }
   int nextIndex = std::rand() % ( 10 - d_level );
+
   while( !d_children[nextIndex].d_active )
   {
     nextIndex = std::rand() % ( 10 - d_level );
   }
   res += d_children[nextIndex].d_value;
   d_children[nextIndex].getRandomGuess( res );
+  checkActiveSons();
 }
 
-void Node::deactivate( char c, int level )
+void Node::checkActiveSons()
+{
+  bool stillHasActiveChildren = false;
+
+  for( unsigned int i = 0; !stillHasActiveChildren && i < d_children.size(); ++i )
+  {
+    if( d_children[i].d_active )
+    {
+      stillHasActiveChildren = true;
+    }
+  }
+  if( !stillHasActiveChildren )
+  {
+    d_active = false;
+  }
+}
+
+void Node::deactivateSons( char c, int level )
 {
   bool found;
 
@@ -116,9 +135,10 @@ void Node::deactivate( char c, int level )
   {
     for( unsigned int i = 0; i < d_children.size(); ++i )
     {
-      d_children[i].deactivate( c, level );
-    }	
+      d_children[i].deactivateSons( c, level );
+    }
   }
+  checkActiveSons();
 }
 
 void Node::print() const
@@ -153,6 +173,13 @@ std::ostream& operator<<( std::ostream& stream, const Node& node )
 }
 
 
+// PRIVATE MEMBER FUNCTIONS
+
+void DecisionTree::updateScores( char c, int toAdd )
+{
+  
+}
+
 // CONSTRUCTORS
 
 DecisionTree::DecisionTree()
@@ -160,6 +187,11 @@ DecisionTree::DecisionTree()
 {
   d_root = Node( "", ' ', 0 );
   std::srand( std::time( 0 ) );
+
+  for( unsigned int i = 0; i < 10; ++i )
+  {
+    scores.push_back( std::make_pair( i, 0 ) );
+  }
 }
 
 
@@ -206,6 +238,7 @@ unsigned int DecisionTree::count() const
   return d_root.count();
 }
 
+
 const std::string DecisionTree::getRandomGuess()
 {
   std::string res;
@@ -218,11 +251,27 @@ void DecisionTree::processGuess( Guess g )
 {
   if( g.ok == 0 )
   {
-    for( int i = 0; i < 4; ++i )
+    if( g.misplaced != 0 )
     {
-      d_root.deactivate( g.guess[i], i );
+      for( int i = 0; i < 4; ++i )
+      {
+	d_root.deactivateSons( g.guess[i], i );
+      }
+    }
+    else
+    {
+      for( int i = 0; i < 4; ++i )
+      {
+	for( int j = 0; j < 4; ++j )
+	{
+	  d_root.deactivateSons( g.guess[i], j );
+	}
+      }
     }
   }
+  // Update the score array
+  //updateScores( g );
+
   d_nLeft = d_root.count();
 }
 
@@ -230,8 +279,8 @@ void DecisionTree::processGuess( Guess g )
 
 std::ostream& operator<<( std::ostream& stream, const DecisionTree& dt )
 {
-  //stream << "Decision Tree" << std::endl;
-  //stream << "Number of possible guesses left: " << dt.nLeft() << std::endl;
+  stream << "Decision Tree" << std::endl;
+  stream << "Number of possible guesses left: " << dt.nLeft() << std::endl;
 
   return stream;
 }
