@@ -1,6 +1,8 @@
 // decisiontree.cpp
 
 #include "decisiontree.hh"
+#include <algorithm>
+#include <iostream>
 
 Node::Node()
 {
@@ -87,14 +89,36 @@ void Node::getRandomGuess( std::string& res )
     d_active = false;
     return;
   }
-  int nextIndex = std::rand() % ( 10 - d_level );
 
+  int nextIndex = std::rand() % ( 10 - d_level );
+  
   while( !d_children[nextIndex].d_active )
   {
     nextIndex = std::rand() % ( 10 - d_level );
   }
   res += d_children[nextIndex].d_value;
   d_children[nextIndex].getRandomGuess( res );
+  checkActiveSons();
+}
+
+void Node::getNextGuess( std::vector<score_t>& scores, std::string& res )
+{
+  if( d_level == 4 )
+  {
+    d_active = false;
+    return;
+  }
+
+  unsigned int best = 0;
+
+  int nextIndex = scores[best].first;
+  
+  while( !d_children[nextIndex].d_active )
+  {
+    nextIndex = scores[++best].first;
+  }
+  res += d_children[nextIndex].d_value;
+  d_children[nextIndex].getNextGuess( scores, res );
   checkActiveSons();
 }
 
@@ -175,9 +199,33 @@ std::ostream& operator<<( std::ostream& stream, const Node& node )
 
 // PRIVATE MEMBER FUNCTIONS
 
-void DecisionTree::updateScores( char c, int toAdd )
+bool compareScores( score_t a, score_t b )
 {
-  
+  return a.second > b.second;
+}
+
+void DecisionTree::updateScores( Guess g )
+{
+  int toAdd = ( ( g.ok != 0 ) ? 2 : 0 ) + ( ( g.misplaced != 0 ) ? 1 : 0 );
+
+  for( unsigned int i = 0; i < 10; ++i )
+  {
+    for( unsigned int j = 0; j < 4; ++j )
+    {
+      if( ( g.guess[j] - '0' ) == scores[i].first )
+      {
+	scores[i].second += toAdd;
+      }
+    }
+  }
+  // Reorder
+
+  std::sort( scores.begin(), scores.end(), compareScores );
+  for( unsigned int i = 0; i < 10; ++i )
+  {
+    std::cout << "(" << scores[i].first << ", " << scores[i].second << ") ";
+  }
+  std::cout << std::endl;
 }
 
 // CONSTRUCTORS
@@ -247,6 +295,14 @@ const std::string DecisionTree::getRandomGuess()
   return res;
 }
 
+const std::string DecisionTree::getNextGuess()
+{
+  std::string res;
+
+  d_root.getNextGuess( scores, res );
+  return res;
+}
+
 void DecisionTree::processGuess( Guess g )
 {
   if( g.ok == 0 )
@@ -270,7 +326,7 @@ void DecisionTree::processGuess( Guess g )
     }
   }
   // Update the score array
-  //updateScores( g );
+  updateScores( g );
 
   d_nLeft = d_root.count();
 }

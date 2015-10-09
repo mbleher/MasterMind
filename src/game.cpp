@@ -61,7 +61,11 @@ unsigned int Game::nLeft() const
 
 const std::string Game::guess()
 {
-  return d_dt.getRandomGuess();
+  if( d_guesses.size() == 0 )
+  {
+    return d_dt.getRandomGuess();
+  }
+  return d_dt.getNextGuess();
 }
 
 Guess Game::evaluateGuess( std::string& guess )

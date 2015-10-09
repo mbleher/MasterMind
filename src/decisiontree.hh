@@ -6,9 +6,10 @@
 #include "guess.hh"
 #include <vector>
 #include <string>
-#include <iostream>
 #include <cstdlib>
 #include <ctime>
+
+typedef std::pair<int, int> score_t;
 
 class Node
 {
@@ -34,6 +35,7 @@ public:
   // MEMBER FUNCTIONS
   unsigned int count() const;
   void getRandomGuess( std::string& res );
+  void getNextGuess( std::vector<score_t>& scores, std::string& res );
   void checkActiveSons();
   void deactivateSons( char c, int level );
   void print() const;
@@ -44,9 +46,9 @@ class DecisionTree
 private:
   unsigned int d_nLeft;
   Node d_root;
-  std::vector<std::pair<int, int> > scores;
+  std::vector<score_t> scores;
 
-  void updateScores( char c, int toAdd );
+  void updateScores( Guess g );
 public:
   // CONSTRUCTORS
   DecisionTree();
@@ -61,6 +63,7 @@ public:
   void print() const;
   unsigned int count() const;
   const std::string getRandomGuess();
+  const std::string getNextGuess();
   void processGuess( Guess g );
 };
 
