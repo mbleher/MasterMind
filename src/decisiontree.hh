@@ -15,6 +15,7 @@ class Node
 {
 private:
   std::vector<Node> d_children;
+  std::string d_completevalue;
   char d_value;
   bool d_active;
   int d_level;
@@ -33,9 +34,10 @@ public:
   const Node& child( unsigned int index ) const;
 
   // MEMBER FUNCTIONS
-  unsigned int count() const;
+  unsigned int countUpdate( Guess g );
   void getRandomGuess( std::string& res );
-  void getNextGuess( std::vector<score_t>& scores, std::string& res );
+  void getNextGuess( std::vector<std::vector<score_t> >& scores,
+		     std::string& res );
   void checkActiveSons();
   void deactivateSons( char c, int level );
   void print() const;
@@ -46,7 +48,7 @@ class DecisionTree
 private:
   unsigned int d_nLeft;
   Node d_root;
-  std::vector<score_t> scores;
+  std::vector<std::vector<score_t> > scores;
 
   void updateScores( Guess g );
 public:
@@ -60,8 +62,7 @@ public:
   unsigned int nLeft() const;
 
   // MEMBER FUNCTIONS
-  void print() const;
-  unsigned int count() const;
+  //unsigned int count() const;
   const std::string getRandomGuess();
   const std::string getNextGuess();
   void processGuess( Guess g );

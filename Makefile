@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++0x -Wall -Werror
+CXXFLAGS=-g -std=c++0x -Wall -Werror
 CPPFILES=guess.cpp decisiontree.cpp game.cpp main.cpp
 SRCDIR=src/
 EXEC=MasterMind

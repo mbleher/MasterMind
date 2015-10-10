@@ -9,12 +9,14 @@ Node::Node()
 }
 
 Node::Node( const std::string& impossible, char value, int level )
-  : d_value( value ), d_active( true ), d_level( level )
+  : d_completevalue( "" ), d_value( value ),
+    d_active( true ), d_level( level )
 {
   bool possible;
 
   if( d_level == 4 )
   {
+    d_completevalue = impossible;
     return;
   }
   
@@ -29,10 +31,11 @@ Node::Node( const std::string& impossible, char value, int level )
 	continue;
       }
     }
-    if( possible )
-    {
-      d_children.push_back( Node( impossible + (char) ( i + '0' ),
+    d_children.push_back( Node( impossible + (char) ( i + '0' ),
 				  i + '0', d_level + 1 ) );
+    if( !possible )
+    {
+      d_children[i].d_active = false;
     }
   }
 }
@@ -61,24 +64,49 @@ const Node& Node::child( unsigned int index ) const
   return d_children[index];
 }
 
-unsigned int Node::count() const
+unsigned int Node::countUpdate( Guess g )
 {
-  if ( !d_active )
+  if ( d_level != 4 && !d_active )
   {
     return 0;
   }
 
   if ( d_level == 4 )
   {
+    short ok = 0;
+    short misplaced = 0;
+    for( unsigned int i = 0; i < 4; ++i )
+    {
+      for( unsigned int j = 0; j < 4; ++j )
+      {
+	if( g.guess[i] == d_completevalue[j] )
+	{
+	  if( i == j )
+	  {
+	    ++ok;
+	  }
+	  else
+	  {
+	    ++misplaced;
+	  }
+	}
+      }
+    }
+    if( ok != g.ok || misplaced != g.misplaced )
+    {
+      d_active = false;
+      return 0;
+    }
     return 1;
   }
 
   unsigned int acc = 0;
   for( unsigned int i = 0; i < d_children.size(); ++i )
   {
-    acc += d_children[i].count();
+    acc += d_children[i].countUpdate( g );
   }
-  
+  checkActiveSons();
+
   return acc;
 }
 
@@ -91,7 +119,7 @@ void Node::getRandomGuess( std::string& res )
   }
 
   int nextIndex = std::rand() % ( 10 - d_level );
-  
+
   while( !d_children[nextIndex].d_active )
   {
     nextIndex = std::rand() % ( 10 - d_level );
@@ -101,7 +129,7 @@ void Node::getRandomGuess( std::string& res )
   checkActiveSons();
 }
 
-void Node::getNextGuess( std::vector<score_t>& scores, std::string& res )
+void Node::getNextGuess( std::vector<std::vector<score_t> >& scores, std::string& res )
 {
   if( d_level == 4 )
   {
@@ -111,11 +139,11 @@ void Node::getNextGuess( std::vector<score_t>& scores, std::string& res )
 
   unsigned int best = 0;
 
-  int nextIndex = scores[best].first;
-  
+  int nextIndex = scores[d_level][best].first;
+
   while( !d_children[nextIndex].d_active )
   {
-    nextIndex = scores[++best].first;
+    nextIndex = scores[d_level][++best].first;
   }
   res += d_children[nextIndex].d_value;
   d_children[nextIndex].getNextGuess( scores, res );
@@ -182,12 +210,12 @@ std::ostream& operator<<( std::ostream& stream, const Node& node )
   {
     return stream << std::endl;
   }
-  
+
   for( int i = 0; i < node.level() - 1; ++i )
   {
     stream << "  ";
   }
-  
+
   stream << node.value();
   for( int i = 0; i < 10 - node.level(); ++i )
   {
@@ -206,27 +234,60 @@ bool compareScores( score_t a, score_t b )
 
 void DecisionTree::updateScores( Guess g )
 {
-  int toAdd = ( ( g.ok != 0 ) ? 2 : 0 ) + ( ( g.misplaced != 0 ) ? 1 : 0 );
+  int coefOk = ( g.ok != 0 ) ? 9 : 0;
+  int coefMisplaced = ( g.misplaced != 0 ) ? 1 : 0;
+
+  // TODO: Fix this (don't increment when misplaced, it's dumb)
 
   for( unsigned int i = 0; i < 10; ++i )
   {
-    for( unsigned int j = 0; j < 4; ++j )
+    for( unsigned int j = 0; j < 4; ++j ) // Current letter
     {
-      if( ( g.guess[j] - '0' ) == scores[i].first )
+      if( ( g.guess[j] - '0' ) == scores[j][i].first )
       {
-	scores[i].second += toAdd;
+	if( g.ok != 0 )
+	{
+	  scores[j][i].second += coefOk;
+	}
+	else
+	{
+	  scores[j][i].second = -100;
+	}
+      }
+      else
+      {
+	for( unsigned int k = 0; k < 4; ++k ) // Other letters
+	{
+	  for( unsigned int l = 0; l < 4; ++l ) // Other levels
+	  {
+	    if( l != j && ( ( g.guess[k] - '0' ) == scores[k][i].first ) )
+	    {
+	      scores[l][i].second += coefMisplaced;
+	    }
+	  }
+	}
       }
     }
   }
   // Reorder
 
-  std::sort( scores.begin(), scores.end(), compareScores );
-  for( unsigned int i = 0; i < 10; ++i )
+  for( unsigned int i = 0; i < 4; ++i )
   {
-    std::cout << "(" << scores[i].first << ", " << scores[i].second << ") ";
+    std::sort( scores[i].begin(), scores[i].end(), compareScores );
   }
-  std::cout << std::endl;
+  /*
+  for( unsigned int j = 0; j < 4; ++j )
+  {
+    for( unsigned int i = 0; i < 10; ++i )
+    {
+      std::cout << "(" << scores[j][i].first << ", "
+		<< scores[j][i].second << ") ";
+    }
+    std::cout << std::endl;
+  }
+  */
 }
+
 
 // CONSTRUCTORS
 
@@ -236,9 +297,13 @@ DecisionTree::DecisionTree()
   d_root = Node( "", ' ', 0 );
   std::srand( std::time( 0 ) );
 
-  for( unsigned int i = 0; i < 10; ++i )
+  for( unsigned int i = 0; i < 4; ++i )
   {
-    scores.push_back( std::make_pair( i, 0 ) );
+    scores.push_back( std::vector<score_t>() );
+    for( unsigned int j = 0; j < 10; ++j )
+    {
+      scores[i].push_back( std::make_pair( j, 0 ) );
+    }
   }
 }
 
@@ -260,32 +325,12 @@ unsigned int DecisionTree::nLeft() const
 
 // MEMBER FUNCTIONS
 
-void DecisionTree::print() const
-{
-  d_root.print();
-  for( unsigned int i = 0; i < 1; ++i )
-  {
-    d_root.child( i ).print();
-    for( unsigned int j = 0; j < 9; ++j )
-    {
-      d_root.child( i ).child( j ).print();
-      for( unsigned int k = 0; k < 8; ++k )
-      {
-	d_root.child( i ).child( j ).child( k ).print();
-	for( unsigned int l = 0; l < 7; ++l )
-	{
-	  d_root.child( i ).child( j ).child( k ).child( l ).print();
-	}
-      }
-    }
-  }
-}
-
+/*
 unsigned int DecisionTree::count() const
 {
   return d_root.count();
 }
-
+*/
 
 const std::string DecisionTree::getRandomGuess()
 {
@@ -328,8 +373,9 @@ void DecisionTree::processGuess( Guess g )
   // Update the score array
   updateScores( g );
 
-  d_nLeft = d_root.count();
+  d_nLeft = d_root.countUpdate( g );
 }
+
 
 // FREE OPERATORS
 

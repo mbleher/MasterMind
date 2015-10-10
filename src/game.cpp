@@ -66,6 +66,7 @@ const std::string Game::guess()
     return d_dt.getRandomGuess();
   }
   return d_dt.getNextGuess();
+  //return d_dt.getRandomGuess();
 }
 
 Guess Game::evaluateGuess( std::string& guess )
@@ -100,5 +101,5 @@ void Game::print() const
 {
   //std::cout << d_dt;
   //d_dt.print();
-  std::cout << d_dt.count() << std::endl;
+  std::cout << d_dt.nLeft() << std::endl;
 }
