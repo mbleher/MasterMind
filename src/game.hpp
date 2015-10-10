@@ -3,8 +3,8 @@
 #ifndef INCLUDED_GAME
 # define INCLUDED_GAME
 
-#include "decisiontree.hh"
-#include "guess.hh"
+#include "decisiontree.hpp"
+#include "guess.hpp"
 #include <string>
 #include <iostream>
 #include <stdexcept>

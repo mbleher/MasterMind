@@ -1,6 +1,6 @@
 // decisiontree.cpp
 
-#include "decisiontree.hh"
+#include "decisiontree.hpp"
 #include <algorithm>
 #include <iostream>
 

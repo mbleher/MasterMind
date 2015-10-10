@@ -1,6 +1,6 @@
 // main.cpp
 
-#include "game.hh"
+#include "game.hpp"
 
 int main( int argc, char *argv[] )
 {

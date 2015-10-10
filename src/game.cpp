@@ -1,6 +1,6 @@
 // game.cpp
 
-#include "game.hh"
+#include "game.hpp"
 
 
 // CONSTRUCTORS

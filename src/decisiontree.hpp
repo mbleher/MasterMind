@@ -3,7 +3,7 @@
 #ifndef INCLUDED_DECISIONTREE
 # define INCLUDED_DECISIONTREE
 
-#include "guess.hh"
+#include "guess.hpp"
 #include <vector>
 #include <string>
 #include <cstdlib>
