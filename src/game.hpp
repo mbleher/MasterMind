@@ -20,7 +20,8 @@ private:
 
 public:
   // CONSTRUCTORS
-  Game( const std::string& goal );
+  Game();
+  Game( const std::string& goal, unsigned int threshold );
   
   // DESTRUCTOR
   ~Game();

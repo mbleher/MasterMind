@@ -5,7 +5,11 @@
 
 // CONSTRUCTORS
 
-Game::Game( const std::string& goal )
+Game::Game()
+{
+}
+
+Game::Game( const std::string& goal, unsigned int threshold )
 {
   bool valid = true;
   std::vector<char> digits;
@@ -30,6 +34,7 @@ Game::Game( const std::string& goal )
     throw std::invalid_argument("All the digits must be different.");
   }
   d_goal = goal;
+  d_dt = DecisionTree( threshold );
 }
 
 

@@ -47,6 +47,7 @@ class DecisionTree
 {
 private:
   unsigned int d_nLeft;
+  unsigned int d_threshold;
   Node d_root;
   std::vector<std::vector<score_t> > scores;
 
@@ -54,6 +55,7 @@ private:
 public:
   // CONSTRUCTORS
   DecisionTree();
+  DecisionTree( unsigned int threshold );
 
   // DESTRUCTOR
   ~DecisionTree();

@@ -6,12 +6,20 @@ int main( int argc, char *argv[] )
 {
   if( argc < 2 )
   {
-    std::cerr << "usage:\t" << argv[0] << " <number>" << std::endl;
+    std::cerr << "usage:\t" << argv[0] << " <number> [<threshold>]" << std::endl;
     return 0;
   }
   try
   {
-    Game g( argv[1] );
+    Game g;
+    if( argc == 3 )
+    {
+      g = Game( argv[1], atoi( argv[2] ) );
+    }
+    else
+    {
+      g = Game( argv[1], 150 );
+    }
     std::string guess = g.guess();
     Guess gs;
     unsigned int nbGuess = 0;

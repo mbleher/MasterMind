@@ -118,11 +118,11 @@ void Node::getRandomGuess( std::string& res )
     return;
   }
 
-  int nextIndex = std::rand() % ( 10 - d_level );
+  int nextIndex = std::rand() % 10;
 
   while( !d_children[nextIndex].d_active )
   {
-    nextIndex = std::rand() % ( 10 - d_level );
+    nextIndex = std::rand() % 10;
   }
   res += d_children[nextIndex].d_value;
   d_children[nextIndex].getRandomGuess( res );
@@ -227,17 +227,20 @@ std::ostream& operator<<( std::ostream& stream, const Node& node )
 
 // PRIVATE MEMBER FUNCTIONS
 
-bool compareScores( score_t a, score_t b )
+bool cmpGt( score_t a, score_t b )
 {
   return a.second > b.second;
+}
+
+bool cmpLt( score_t a, score_t b )
+{
+  return a.second < b.second;
 }
 
 void DecisionTree::updateScores( Guess g )
 {
   int coefOk = ( g.ok != 0 ) ? 9 : 0;
   int coefMisplaced = ( g.misplaced != 0 ) ? 1 : 0;
-
-  // TODO: Fix this (don't increment when misplaced, it's dumb)
 
   for( unsigned int i = 0; i < 10; ++i )
   {
@@ -267,13 +270,21 @@ void DecisionTree::updateScores( Guess g )
 	  }
 	}
       }
+
     }
   }
   // Reorder
 
   for( unsigned int i = 0; i < 4; ++i )
   {
-    std::sort( scores[i].begin(), scores[i].end(), compareScores );
+    if( d_nLeft > d_threshold )
+    {
+      std::sort( scores[i].begin(), scores[i].end(), cmpLt );
+    }
+    else
+    {
+      std::sort( scores[i].begin(), scores[i].end(), cmpGt );
+    }
   }
   /*
   for( unsigned int j = 0; j < 4; ++j )
@@ -307,6 +318,21 @@ DecisionTree::DecisionTree()
   }
 }
 
+DecisionTree::DecisionTree( unsigned int threshold )
+  : d_nLeft( 10 * 9 * 8 * 7 ), d_threshold( threshold )
+{
+  d_root = Node( "", ' ', 0 );
+  std::srand( std::time( 0 ) );
+
+  for( unsigned int i = 0; i < 4; ++i )
+  {
+    scores.push_back( std::vector<score_t>() );
+    for( unsigned int j = 0; j < 10; ++j )
+    {
+      scores[i].push_back( std::make_pair( j, 0 ) );
+    }
+  }
+}
 
 // DESTRUCTOR
 
